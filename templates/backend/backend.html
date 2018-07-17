@@ -1,0 +1,54 @@
+{% extends 'backend/base.html' %}
+
+
+
+{% block content %}
+
+ <div class="article_list small">
+
+                             <table class="table table-hover table-striped">
+                                 <thead>
+                                     <th>标题</th>
+                                     <th>评论数</th>
+                                     <th>点赞数</th>
+                                     <th>操作</th>
+                                     <th>操作</th>
+                                 </thead>
+                                 <tbody>
+                                     {% for article in article_list %}
+                                     <tr>
+                                         <td>{{ article.title }}</td>
+                                         <td>{{ article.comment_count }}</td>
+                                         <td>{{ article.up_count }}</td>
+                                         <td><a href="/update/{{ article.pk }}">编辑</a></td>
+                                         <td>
+                                             <a href="javascript:void(0)" class="del" article="{{ article.pk }}">删除</a>
+                                         </td>
+                                     </tr>
+                                     {% endfor %}
+                                 </tbody>
+                             </table>
+                        </div>
+    {% csrf_token %}
+    <script>
+    $('.del').click(function () {
+        var $fathar = $(this).parent().parent();
+        var article_id = $(this).attr('article');
+        $.ajax({
+            url:'/delete/',
+            type:'post',
+            data:{
+                article:article_id,
+                'csrfmiddlewaretoken': $("[name = 'csrfmiddlewaretoken']").val()
+            },
+            success:function (data) {
+                if(data.state) {
+                    $fathar.html('删除成功').css({'color':'red'})
+                }
+            }
+        }, setTimeout(function () {
+            $fathar.html('')
+        },1000))
+    })
+    </script>
+{% endblock %}
