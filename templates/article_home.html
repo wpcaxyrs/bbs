@@ -1,0 +1,324 @@
+{% extends 'home_page.html' %}
+
+`{% block style %}
+    <style>
+        #div_digg {
+            float: right;
+            margin-bottom: 100px;
+            margin-right: 200px;
+            font-size: 12px;
+            width: 125px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .diggit {
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url(/static/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        #content .post {
+            font-size: 14px;
+            line-height: 1.8;
+            padding-left: 10px;
+        }
+
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url(/static/downdown.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+
+        }
+
+        .diggword {
+            clear: both;
+            color: red;
+        }
+
+        #comment_form_container .comment_textarea {
+            width: 362px;
+            height: 200px;
+            font-size: 13px;
+            padding: 8px;
+            margin-bottom: 10px;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+        }
+
+        div.commentform textarea {
+            width: 450px;
+            height: 300px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            font-family: 'PingFang SC', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        textarea {
+            font-family: monospace;
+            border-color: rgb(169, 169, 169);
+        }
+
+        textarea {
+            -webkit-appearance: textarea;
+            background-color: white;
+            -webkit-rtl-ordering: logical;
+            user-select: text;
+            flex-direction: column;
+            cursor: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border-width: 1px;
+            border-style: solid;
+            border-color: initial;
+            border-image: initial;
+            padding: 2px;
+        }
+        .comment{
+            clear: both;
+        }
+        .header {
+            width: 100%;
+            height: 59px;
+            background-color: #369;
+        }
+
+        .header .title {
+            line-height: 59px;
+            color: white;
+            font-weight: lighter;
+            margin-left: 20px;
+            font-size: 18px;
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block hearder %}
+    <div class="header">
+        <p class="title">{{ blogs.title }}</p>
+    </div>
+{% endblock %}
+
+
+
+{% block comment %}
+    <div class="col-md-3">
+        {% load my_tags %}
+
+        {% cat_tag_time username %}
+    </div>
+    <div class="col-md-9">
+        {% for art in article %}
+            <div class="art_title">
+                <h3><a href="">{{ art.title }}</a></h3>
+            </div>
+            <div class="content">
+                {{ art.content | safe }}
+            </div>
+            <div id="div_digg">
+                <div class="diggit active">
+                    <span class="diggnum" id="digg_count">{{ art.up_count }}</span>
+                </div>
+                <div class="buryit active">
+                    <span class="burynum" id="bury_count">{{ art.down_count }}</span>
+                </div>
+                <div class="diggword">
+                </div>
+            </div>
+         {% csrf_token %}
+            <hr>
+{#            评论区块#}
+            <div class="comment">
+                <div>
+                    <p>评论列表</p>
+                    <div>
+                        <ul class="list-group comment_list">
+                        {% for com in comment_list %}
+                            <li class="list-group-item">
+                                <div class="com_header">
+                                    <a href="">#{{ forloop.counter }}楼</a>
+                                 &nbsp;&nbsp;
+                                    <span class="small">
+                                        {{com.create_time|date:'Y-m-d H:i'}}
+                                    </span> &nbsp;&nbsp;
+                                    <span>
+                                        <a href="/{{ com.user.username }}/">{{ com.user.username }}</a>
+                                    </span>
+                                    <span class="pull-right">
+                                        <a href="javascript:void(0)" class="hufu" username="{{ com.user.username }} " com_id="{{ com.pk }}">
+                                            回复
+                                        </a>
+                                    </span>
+                                </div>
+                                {% if com.parent_comment_id %}
+                                    <div class="parent_comment_info well">
+                                         <p>
+                                             {{ com.parent_comment.user }}: {{ com.parent_comment.content }}
+                                         </p>
+                                    </div>
+                                {% endif %}
+                                    <p>{{ com.content }}</p>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <p>发表评论</p>
+                    <hr>
+                    <p>昵称：
+                        <input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50"
+                               value="{{ request.user.username }}">
+                    </p>
+                </div>
+                <span class="error" style="color: red;"></span>
+                <div class="">
+                    <div>评论内容:</div>
+                    <div>
+                        <textarea id="tbCommentBody" class="comment_textarea" cols="60" rows="10"></textarea>
+                    </div>
+                    <input type="button" value="提交" class="btn btn-default comment_btn">
+                </div>
+
+            </div>
+
+    </div>
+
+            <script>
+            //点赞ajax方式
+                $('.active').click(function () {
+                    var is_up = $(this).hasClass('diggit');
+                    var _this = $(this).children('span');
+                    if ("{{ request.user.username }}") {
+                        $.ajax({
+                            url: '/digg/',
+                            type: 'post',
+                            data: {
+                                'is_up': is_up,
+                                'article_id': "{{ art.pk }}",
+                                'csrfmiddlewaretoken': $("[name = 'csrfmiddlewaretoken']").val()},
+                            success: function (data) {
+                                console.log(data);
+                                //出错原因：导入数据出错参数没有执行
+                                if (data.state) {
+                                    //提交成功后的操作
+                                    var val = _this.text();
+                                    _this.text(parseInt(val) + 1)
+                                } else {
+                                    //失败后的操作
+                                    // var val = data.msg?"您已推荐":"您已反对"
+                                    //$(".diggword").html(val)
+                                    if (data.msg) {
+                                        $(".diggword").html("您已推荐")
+                                    } else {
+                                        $(".diggword").html("您已反对")
+                                    }
+                                    setTimeout(function () {
+                                         $(".diggword").html("")
+                                    },1000)
+                                }
+                            }
+                        })
+                    } else {
+                        location.href = '/login/'
+                    }
+                });
+
+            //评论方式
+                var pid = '';
+                $('.comment_btn').click(function () {
+                    var content = $('#tbCommentBody').val();
+                    if(pid){
+                        var index = content.indexOf('\n');
+                        content = content.slice(index+1)
+                    }
+                    if("{{ request.user.username }}")
+                    {
+                        $.ajax({
+                        url:'/comment/',
+                        type:'post',
+                        data:{
+                            'content':content,
+                            'pid':pid,
+                            'article_id':{{ art.pk }},
+                            'user_id':{{ request.user.pk }},
+                            'csrfmiddlewaretoken': $("[name = 'csrfmiddlewaretoken']").val()
+                        },
+                        success:function (data) {
+                            console.log(data);
+                            if(data.state){
+{# data = jsonpCallback('data') #}
+                                //不为空
+                                var com_timer = data.timer;
+                                var com_content= data.content;
+                                var com_user = data.user;
+                                var $li = `<li class="list-group-item">
+                                <div class="com_header">
+                                    <span>
+                                        <a href="{{ request.user.username }}/">{{ request.user.username }}</a>
+                                    </span>
+                                    <span>${ com_timer }</span>
+                                </div>
+                                    <p>${ com_content }</p>
+                            </li>`;
+                                var $li2 =`<li class="list-group-item">
+                                <div class="com_header">
+                                    <span>
+                                        <a href="{{ request.user.username }}/">{{ request.user.username }}</a>
+                                    </span>
+                                    <span>${ com_timer }</span>
+                                </div>
+                                    <div class="parent_comment_info ">
+                                             <p>
+                                                @ ${ com_user }
+                                             </p>
+                                    </div>
+                                    <p>${ com_content }</p>
+                            </li>`;
+                                if(data.pid){
+                                     $('.comment_list').append($li2)
+                                }else {
+                                     $('.comment_list').append($li)
+                                }
+                            }else {
+                                $('.error').html('不能为空')
+                                //为空
+                            }
+                            //清除框内容
+                            $('#tbCommentBody').val("");
+                            setTimeout(function (){
+                                $('.error').html('')
+                            },1000)
+                        }
+                    })
+                }else {
+                        location.href = '/login/'
+                    }});
+            //子评论
+                $('.hufu').click(function () {
+                    $("#tbCommentBody").focus();
+                    var val='@' + $(this).attr('username') + '\n';
+                    $("#tbCommentBody").val(val);
+                    pid = $(this).attr('com_id');})
+            </script>
+{% endfor %}
+{% endblock %}
