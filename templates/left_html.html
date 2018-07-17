@@ -1,0 +1,35 @@
+<div class="list-group">
+    <a href="#" class="list-group-item active">
+        分类
+    </a>
+    {% for cate in category_list %}
+        <a href="/{{ username }}/category/{{ cate.0 }}" class="list-group-item">{{ cate.0 }}({{ cate.1 }})</a>
+    {% endfor %}
+
+    <a href="#" class="list-group-item active biaoqian">
+        标签
+    </a>
+    {% for tag in Tag_list %}
+        <a href="/{{ username }}/tag/{{ tag.0 }}" class="list-group-item">{{ tag.0 }}({{ tag.1 }})</a>
+    {% endfor %}
+
+    <a href="#" class="list-group-item active biaoqian">
+        日期归档
+    </a>
+    {% for tim in time %}
+        <a href="/{{ username }}/article/{{ tim.0 }}" class="list-group-item">{{ tim.0 }}({{ tim.1 }})</a>
+    {% endfor %}
+
+
+    <a href="#" class="list-group-item disabled biaoqian">
+        看新闻板块----->
+    </a>
+    <a href="#" class="list-group-item">对的就是这里有新新闻--></a>
+    <a href="#" class="list-group-item">楼上的你骗我~~(>_<)~~</a>
+    <a href="#" class="list-group-item">一楼是傻逼╭(╯^╰)╮</a>
+    <a href="#" class="list-group-item">楼上的都是傻逼</a>
+    <a href="#" class="list-group-item">对的就是这里有新新闻--></a>
+    <a href="#" class="list-group-item">楼上的你骗我~~(>_<)~~</a>
+    <a href="#" class="list-group-item">一楼是傻逼╭(╯^╰)╮</a>
+    <a href="#" class="list-group-item">楼上的都是傻逼</a>
+</div>

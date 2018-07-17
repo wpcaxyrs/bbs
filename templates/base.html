@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <script src="/static/jquery/jquery-3.3.1.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <script src="/static/bootstrap/js/bootstrap.js"></script>
+    {% block style %}
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .last {
+            margin-top: 10px;
+        }
+        .art_title {
+            font-size: large;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+{% block hearder %}
+    <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <img src="/static/wpc.jpg" alt="" height="50px">
+            <a class="navbar-brand" href="#">BBS</a>
+
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#">博问<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">知道</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">更多世界<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">心灵鸡汤板块</a></li>
+                        <li><a href="#">技术先锋板块</a></li>
+                        <li><a href="#">黑客世界板块</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">页面设置</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">帮助</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                {% if request.user.username %}
+                    <li>
+                        <a href="#"><span class="glyphicon glyphicon-plane"></span>&nbsp;{{ request.user.username }}</a>
+                    </li>
+                {% else %}
+                    <li><a href="/login/">登录</a></li>
+                {% endif %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">个人信息 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">账户设置</a></li>
+                        <li><a href="#">密码修改</a></li>
+                        <li><a href="/backend/">个人管理</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/logout/">注销</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+
+{% block container %}
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item disabled">
+                    快看这里有新闻-->
+                </a>
+                <a href="#" class="list-group-item">对的就是这里有新新闻--></a>
+                <a href="#" class="list-group-item">楼上的你骗我~~(>_<)~~</a>
+                <a href="#" class="list-group-item">一楼是傻逼╭(╯^╰)╮</a>
+                <a href="#" class="list-group-item">楼上的都是傻逼</a>
+                <a href="#" class="list-group-item">对的就是这里有新新闻--></a>
+                <a href="#" class="list-group-item">楼上的你骗我~~(>_<)~~</a>
+                <a href="#" class="list-group-item">一楼是傻逼╭(╯^╰)╮</a>
+                <a href="#" class="list-group-item">楼上的都是傻逼</a>
+            </div>
+        </div>
+        {% block comment %}
+        <div class="col-md-6" >
+            {% for article in Article_list %}
+                <div class="art_title">
+                    <a href="/{{ article.user.username }}/articles/{{ article.pk }}"><p>{{ article.title }}</p></a>
+                </div>
+                <div class="art_desc">
+
+                <span class ="media-left">
+                    <img src="/static/iimg/haocheng.jpg" alt="" height="40px" width="40px" ></span>
+{#  这里利用左右浮动使得文章描述分离，取消环绕情况#}
+                    <span class="media-right" >{{ article.desc }}</span>
+                </div>
+
+                <div class="last">
+                    <a href="/{{ article.user.username }}/"> {{ article.user.username }} </a>
+                    &nbsp;
+                    <span>发布于{{ article.create_time|date:'Y-m-d H:i' }}</span>&nbsp;&nbsp;
+
+                    <span><span class="glyphicon glyphicon-thumbs-up"></span><a href="">点赞({{ article.up_count }})</a></span>&nbsp;&nbsp;
+
+                    <span><span class="glyphicon glyphicon-comment"></span><a href="">评论({{ article.comment_count }})</a></span>
+                </div>
+            <hr>
+            {% endfor %}
+
+        </div>
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item disabled">
+                    <--快看这里有新闻
+                </a>
+                <a href="#" class="list-group-item"><--对的就是这里有新新闻</a>
+                <a href="#" class="list-group-item">~~(>_<)~~楼上的你骗我</a>
+                <a href="#" class="list-group-item">╭(╯^╰)╮一楼是傻逼</a>
+                <a href="#" class="list-group-item">楼上的都是傻逼</a>
+                <a href="#" class="list-group-item"><--对的就是这里有新新闻</a>
+                <a href="#" class="list-group-item">~~(>_<)~~楼上的你骗我</a>
+                <a href="#" class="list-group-item">╭(╯^╰)╮一楼是傻逼</a>
+                <a href="#" class="list-group-item">楼上的都是傻逼</a>
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+
+</div>
+
+{% endblock %}
+</body>
+</html>
